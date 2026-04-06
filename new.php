@@ -77,7 +77,7 @@
                     .then(result => {
                         closeModal(result);
                     })
-                    .catch(error => console.error("Помилка відправки:", error));
+                    .catch(error => console.error("Error sending request:", error));
                 });
             });
         </script>

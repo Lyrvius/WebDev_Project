@@ -110,13 +110,13 @@
                     })
                     .then(response => response.json())
                     .then(result => closeModal(result))
-                    .catch(error => console.error("Помилка оновлення:", error));
+                    .catch(error => console.error("Error updating:", error));
                 });
 
                 // Видалення
                 var btnDelete = document.getElementById("btn-delete");
                 btnDelete.addEventListener("click", function () {
-                    if (confirm("Ви дійсно хочете видалити це бронювання?")) {
+                    if (confirm("Are you sure you want to delete this reservation?")) {
                         var id = document.querySelector('input[name="id"]').value;
                         var formData = new FormData();
                         formData.append("id", id);
@@ -127,7 +127,7 @@
                         })
                         .then(response => response.json())
                         .then(result => closeModal(result))
-                        .catch(error => console.error("Помилка видалення:", error));
+                        .catch(error => console.error("Error deleting:", error));
                     }
                 });
             });
