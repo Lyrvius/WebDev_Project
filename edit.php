@@ -3,7 +3,16 @@
     <head>
         <meta charset="UTF-8">
         <title>Edit Reservation</title>
-        <script src="js/jquery-1.9.1.min.js" type="text/javascript"></script>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            div { margin-bottom: 10px; }
+            input[type="text"], select { width: 100%; padding: 5px; box-sizing: border-box; }
+            .buttons { margin-top: 20px; display: flex; gap: 10px; }
+            button { padding: 6px 15px; border: none; color: white; cursor: pointer; }
+            .save-btn { background-color: #4CAF50; }
+            .cancel-btn { background-color: #777; }
+            .delete-btn { background-color: #f44336; margin-left: auto; /* Відсуває кнопку видалення вправо */ }
+        </style>
     </head>
     <body>
         <?php
@@ -17,18 +26,18 @@
             
             $rooms = $db->query('SELECT * FROM rooms');
         ?>
-        <form id="f" action="backend_update.php" method="POST" style="padding:20px;">
+        <form id="f" action="backend_update.php" method="POST">
             <input type="hidden" name="id" value="<?php echo htmlspecialchars($id); ?>" />
             
             <h1>Edit Reservation</h1>
             <div>Name: </div>
-            <div><input type="text" id="name" name="name" value="<?php echo htmlspecialchars($reservation['name']); ?>" /></div>
+            <div><input type="text" id="name" name="name" value="<?php echo htmlspecialchars($reservation['name']); ?>" required /></div>
             
             <div>Start:</div>
-            <div><input type="text" id="start" name="start" value="<?php echo $reservation['start']; ?>" /></div>
+            <div><input type="text" id="start" name="start" value="<?php echo htmlspecialchars($reservation['start']); ?>" /></div>
             
             <div>End:</div>
-            <div><input type="text" id="end" name="end" value="<?php echo $reservation['end']; ?>" /></div>
+            <div><input type="text" id="end" name="end" value="<?php echo htmlspecialchars($reservation['end']); ?>" /></div>
             
             <div>Room:</div>
             <div>
@@ -71,10 +80,57 @@
                 </select>
             </div>
             
-            <div style="margin-top: 15px;">
-                <input type="submit" value="Save" /> 
-                <a href="javascript:close();">Cancel</a>
+            <div class="buttons">
+                <button type="submit" class="save-btn">Save</button> 
+                <button type="button" class="cancel-btn" onclick="closeModal();">Cancel</button>
+                
+                <button type="button" id="btn-delete" class="delete-btn">Delete</button>
             </div>
         </form>
+
+        <script type="text/javascript">
+            function closeModal(result) {
+                if (parent && parent.DayPilot && parent.DayPilot.ModalStatic) {
+                    parent.DayPilot.ModalStatic.close(result);
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                document.getElementById("name").focus();
+
+                // Оновлення
+                var form = document.getElementById("f");
+                form.addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    var formData = new FormData(form);
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(result => closeModal(result))
+                    .catch(error => console.error("Помилка оновлення:", error));
+                });
+
+                // Видалення
+                var btnDelete = document.getElementById("btn-delete");
+                btnDelete.addEventListener("click", function () {
+                    if (confirm("Ви дійсно хочете видалити це бронювання?")) {
+                        var id = document.querySelector('input[name="id"]').value;
+                        var formData = new FormData();
+                        formData.append("id", id);
+
+                        fetch("backend_delete.php", {
+                            method: "POST",
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(result => closeModal(result))
+                        .catch(error => console.error("Помилка видалення:", error));
+                    }
+                });
+            });
+        </script>
     </body>
 </html>
